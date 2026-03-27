@@ -7,10 +7,29 @@ Ask Claude to design SMARTS patterns and validate them with RDKit against the co
 
 CLI: `python main.py --input data/compounds.csv`
 
+## Logic
+- Define a prompt asking Claude for 3 specific SMARTS patterns: acrylamide warhead, halogenated aniline, EWG aromatic
+- Parse JSON array of `{name, smarts, description}` from Claude's response
+- Validate each SMARTS with `Chem.MolFromSmarts(pattern)` — returns None if invalid
+- Run valid patterns against all 45 compounds using `mol.HasSubstructMatch()`
+- Report: valid count, hit counts per pattern, pattern quality assessment
+
 ## Key Concepts
 - Claude generates SMARTS as structured output
 - RDKit validates via `Chem.MolFromSmarts(pattern)` and `mol.HasSubstructMatch()`
 - Tests whether LLMs can produce executable cheminformatics code
+
+## Verification Checklist
+- [x] Claude generates 3 SMARTS patterns in JSON format
+- [x] RDKit validation attempted for each pattern
+- [x] 1/3 valid SMARTS — honest reporting of failures
+- [x] 0/45 hits even for valid pattern (too restrictive)
+- [x] Key finding documented: LLMs need SMARTS validation
+
+## Risks (materialized)
+- Generated SMARTS may be syntactically invalid — 2/3 were invalid (unmatched bracket, invalid atom)
+- Valid SMARTS may be too restrictive — confirmed ([C;H1] matcher too narrow)
+- This is the expected finding: validates the tool-use pattern (Phase 57) over code generation
 
 ## Results
 | Metric | Value |
